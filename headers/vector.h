@@ -10,7 +10,7 @@ Vector createVector(int rows);
 
 Vector initVector(double data[], int rows);
 
-void freeVector(Vector vec);
+void freeVector(Vector* vec);
 
 double innerProduct(Vector* vec1, Vector* vec2);
 

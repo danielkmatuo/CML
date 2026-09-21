@@ -1,3 +1,5 @@
+#include <assert.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include "../headers/vector.h"
 
@@ -24,13 +26,22 @@ Vector initVector(double data[], int rows) {
     return vec;
 }
 
-void freeVector(Vector vec) {
-    free(vec.data);
+void freeVector(Vector* vec) {
+    if (vec == NULL) {
+        printf("Passed already NULL pointer");
+        return;
+    }
+
+    free(vec->data);
+    vec->data = NULL;
+
     return;
 }
 
 double innerProduct(Vector* vec1, Vector* vec2) {
-    double sum = 0.0f; 
+    assert(vec1->rows == vec2->rows);
+
+    double sum = 0.0; 
 
     int n = vec1->rows;
     int m = vec2->rows;
