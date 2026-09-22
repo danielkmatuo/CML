@@ -1,16 +1,20 @@
 #ifndef VECTOR_H
 #define VECTOR_H
 
+#include <stdio.h>
+
 typedef struct {
-    int rows;
+    size_t len;
     double* data;
 } Vector;
 
-Vector createVector(int rows);
+Vector createVector(size_t len);
 
-Vector initVector(double data[], int rows);
+Vector initVector(double* data, size_t len);
 
 void freeVector(Vector* vec);
+
+size_t length(Vector* vec);
 
 double innerProduct(Vector* vec1, Vector* vec2);
 

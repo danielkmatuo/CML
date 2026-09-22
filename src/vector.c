@@ -1,22 +1,21 @@
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
+
 #include "../headers/vector.h"
 
-Vector createVector(int rows) {
-    double* p = malloc(rows * sizeof(double)); 
-
+Vector createVector(size_t len) {
     Vector vec;
-    vec.rows = rows;
-    vec.data = p;
+    vec.len = len;
 
     return vec;
 }
 
-Vector initVector(double data[], int rows) {
-    Vector vec = createVector(rows); 
+Vector initVector(double* data, size_t len) {
+    Vector vec = createVector(len); 
+    vec.data = malloc(len * sizeof(*data));
     
-    int idx = vec.rows;
+    size_t idx = vec.len;
 
     while (idx > 0) {
         vec.data[idx - 1] = data[idx - 1];
@@ -28,7 +27,7 @@ Vector initVector(double data[], int rows) {
 
 void freeVector(Vector* vec) {
     if (vec == NULL) {
-        printf("Passed already NULL pointer");
+        printf("Passed already NULL vector\n");
         return;
     }
 
@@ -38,13 +37,20 @@ void freeVector(Vector* vec) {
     return;
 }
 
+size_t length(Vector* vec) {
+    return vec->len;
+}
+
 double innerProduct(Vector* vec1, Vector* vec2) {
-    assert(vec1->rows == vec2->rows);
+    size_t len1 = length(vec1);
+    size_t len2 = length(vec2);
+
+    assert(len1 == len2);
 
     double sum = 0.0; 
 
-    int n = vec1->rows;
-    int m = vec2->rows;
+    size_t n = len1;
+    size_t m = len2;
     
     while (n > 0 && m > 0) {
         sum += vec1->data[n - 1] * vec2->data[m - 1];
