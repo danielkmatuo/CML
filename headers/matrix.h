@@ -29,8 +29,8 @@ void scalarSum(double scalar, Matrix* mat);
 
 Matrix matMul(Matrix* mat1, Matrix* mat2);
 
-Matrix matSum(Matrix* mat1, Matrix* mat2);
+void matSum(Matrix* mat1, Matrix* mat2, Matrix* target); //avoid creating a new matrix for this function also
 
-Matrix vecTVecMul(Vector* vec1, Vector* vec2);
+void vecTVecMul(Vector* vec1, Vector* vec2, Matrix* mat); //to avoid storing more matrices on memory
 
 #endif

@@ -90,9 +90,11 @@ Matrix matMul(Matrix* mat1, Matrix* mat2) {
 
 }
 
-Matrix matSum(Matrix* mat1, Matrix* mat2) {
+void matSum(Matrix* mat1, Matrix* mat2, Matrix* target) {
     u32 rows = mat1->shape.rows;
     u32 cols = mat1->shape.cols;
+
+    assert(rows == mat2->shape.rows && cols == mat2->shape.cols);
 
     double* colsP = malloc(cols * sizeof(*colsP));
     colsP = NULL;
@@ -115,14 +117,15 @@ Matrix matSum(Matrix* mat1, Matrix* mat2) {
         }
     }
 
-    return finalMat;
+    return;
 }
 
-Matrix vecTVecMul(Vector* vec1, Vector* vec2) {
+void vecTVecMul(Vector* vec1, Vector* vec2, Matrix* mat) {
     if (!vec2->transposed) {
-        transposeVector(vec2);
-    }
+        transposeVector(vec2); 
+    } 
 
-    u32 rows = length(vec1);
-    u32 cols = length(vec2);
+    assert(length(vec1) == length(vec2));
+
+     
 }
