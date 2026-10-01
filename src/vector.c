@@ -6,7 +6,6 @@
 Vector createVector(size_t len) {
     Vector vec;
     vec.len = len;
-    vec.transposed = false;
 
     return vec;
 }
@@ -39,12 +38,6 @@ void freeVector(Vector* vec) {
 
 size_t length(Vector* vec) {
     return vec->len;
-}
-
-void transposeVector(Vector* vec) {
-    vec->transposed = true;
-
-    return;
 }
 
 double innerProduct(Vector* vec1, Vector* vec2) {

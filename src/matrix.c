@@ -5,11 +5,6 @@
 
 #include "../headers/matrix.h"
 
-typedef uint32_t u32;
-typedef uint64_t u64;
-typedef int32_t i32;
-typedef int64_t i64;
-
 Matrix createMatrix(size_t rows, size_t cols) {
     Matrix mat;
     mat.shape.rows = rows;
@@ -18,7 +13,7 @@ Matrix createMatrix(size_t rows, size_t cols) {
     return mat;
 }
 
-Matrix initMatrix(size_t rows, size_t cols, double** data) {
+Matrix initMatrix(u32 rows, u32 cols, double** data) {
     Matrix mat = createMatrix(rows, cols);
 
     mat.data = malloc(rows * sizeof(*data));
@@ -81,13 +76,55 @@ void scalarSum(double scalar, Matrix* mat) {
 Matrix matMul(Matrix* mat1, Matrix* mat2) {
     assert(mat1->shape.cols == mat2->shape.rows);
 
-    double* pRow = NULL;
-    double* pCol = NULL;
-    double sum = 0;
-
     u32 totalRows = mat1->shape.rows;
     u32 totalCols = mat2->shape.cols;
 
+    double** dataMat = malloc(totalRows * sizeof(*dataMat));
+    Matrix finalMat = initMatrix(totalRows, totalCols, dataMat);
+
+    double* dataVecX = malloc(totalRows * sizeof(*dataVecX));
+    double* dataVecY = malloc(totalCols * sizeof(*dataVecY));
+    Vector vecX = initVector(dataVecX, totalCols);
+    Vector vecY = initVector(dataVecY, totalRows); 
+
+    Shape coord;
+    coord.rows = 0;
+    coord.cols = 0;
+    
+    u32* pRows = &coord.rows;
+    u32* pCols = &coord.cols;
+
+    while (coord.rows < totalRows) {
+        if (*pCols > totalCols) {
+            *pCols = 0;
+            *pRows = *pRows + 1;
+        }
+        else {
+            *pCols = *pCols + 1;
+        }
+        
+        u32 temp = *pCols;
+
+        while (*pCols < totalCols) {
+            vecX.data[*pCols] = mat1->data[*pRows][*pCols];
+            *pCols = *pCols + 1;
+        }
+        *pCols = temp;
+        temp = *pRows;
+
+        while (*pRows < totalRows) {
+            vecY.data[*pRows] = mat2->data[*pRows][*pCols];
+            *pRows = *pRows + 1;
+        }
+        *pRows = temp;
+
+        finalMat.data[*pRows][*pCols] = innerProduct(&vecX, &vecY);
+    }
+
+    freeVector(&vecX);
+    freeVector(&vecY);
+
+    return finalMat;
 }
 
 void matSum(Matrix* mat1, Matrix* mat2, Matrix* target) {
@@ -96,36 +133,11 @@ void matSum(Matrix* mat1, Matrix* mat2, Matrix* target) {
 
     assert(rows == mat2->shape.rows && cols == mat2->shape.cols);
 
-    double* colsP = malloc(cols * sizeof(*colsP));
-    colsP = NULL;
-    
-    for (u32 j = 0; j < cols; j++) {
-        colsP[j] = 0.0;
-    }
-
-    double** finalMatData = malloc(rows * sizeof(colsP));
-
-    for (u32 i = 0; i < rows; i++) {
-        finalMatData[i] = colsP;
-    }
-    
-    Matrix finalMat = initMatrix(rows, cols, finalMatData);
-
     for (u32 i = 0; i < rows; i++) {
         for (u32 j = 0; j < cols; j++) {
-            finalMat.data[i][j] = mat1->data[i][j] + mat2->data[i][j];
+            target->data[i][j] = mat1->data[i][j] + mat2->data[i][j];
         }
     }
 
     return;
-}
-
-void vecTVecMul(Vector* vec1, Vector* vec2, Matrix* mat) {
-    if (!vec2->transposed) {
-        transposeVector(vec2); 
-    } 
-
-    assert(length(vec1) == length(vec2));
-
-     
 }

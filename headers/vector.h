@@ -6,7 +6,6 @@
 
 typedef struct {
     size_t len;
-    bool transposed;
     double* data;
 } Vector;
 
@@ -17,8 +16,6 @@ Vector initVector(double* data, size_t len);
 void freeVector(Vector* vec);
 
 size_t length(Vector* vec);
-
-void transposeVector(Vector* vec);
 
 double innerProduct(Vector* vec1, Vector* vec2);
 
