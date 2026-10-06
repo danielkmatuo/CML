@@ -21,9 +21,9 @@ typedef struct {
     double** data;
 } Matrix;
 
-Matrix createMatrix(size_t rows, size_t cols);
+Matrix initMatrix(u32 rows, u32 cols);
 
-Matrix initMatrix(u32 rows, u32 cols, double** data);
+Matrix createMatrix(u32 rows, u32 cols, double** data);
 
 void freeMatrix(Matrix* mat);
 
@@ -35,6 +35,6 @@ void scalarSum(double scalar, Matrix* mat);
 
 Matrix matMul(Matrix* mat1, Matrix* mat2);
 
-void matSum(Matrix* mat1, Matrix* mat2, Matrix* target); //avoid creating a new matrix for this function also
+Matrix matSum(Matrix* mat1, Matrix* mat2); 
 
 #endif

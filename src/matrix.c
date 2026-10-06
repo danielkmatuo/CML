@@ -3,9 +3,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "../headers/matrix.h"
+#include "../include/matrix.h"
 
-Matrix createMatrix(size_t rows, size_t cols) {
+Matrix initMatrix(u32 rows, u32 cols) {
     Matrix mat;
     mat.shape.rows = rows;
     mat.shape.cols = cols;
@@ -13,10 +13,10 @@ Matrix createMatrix(size_t rows, size_t cols) {
     return mat;
 }
 
-Matrix initMatrix(u32 rows, u32 cols, double** data) {
-    Matrix mat = createMatrix(rows, cols);
+Matrix createMatrix(u32 rows, u32 cols, double** data) {
+    Matrix mat = initMatrix(rows, cols);
 
-    mat.data = malloc(rows * sizeof(*data));
+    mat.data = malloc(rows * cols * sizeof(**data));
 
     for (size_t i = 0;  i < rows; i++) {
         for (u32 j = 0; j < cols; j++) {
@@ -29,7 +29,7 @@ Matrix initMatrix(u32 rows, u32 cols, double** data) {
 
 void freeMatrix(Matrix* mat) {
     if (mat == NULL) {
-        printf("Passed already NULL matrix\n");
+        printf("Passed NULL matrix\n");
         return;
     } 
 
@@ -79,8 +79,8 @@ Matrix matMul(Matrix* mat1, Matrix* mat2) {
     u32 totalRows = mat1->shape.rows;
     u32 totalCols = mat2->shape.cols;
 
-    double** dataMat = malloc(totalRows * sizeof(*dataMat));
-    Matrix finalMat = initMatrix(totalRows, totalCols, dataMat);
+    double** dataMat = malloc(totalRows * totalCols * sizeof(**dataMat));
+    Matrix finalMat = createMatrix(totalRows, totalCols, dataMat);
 
     double* dataVecX = malloc(totalRows * sizeof(*dataVecX));
     double* dataVecY = malloc(totalCols * sizeof(*dataVecY));
@@ -99,10 +99,7 @@ Matrix matMul(Matrix* mat1, Matrix* mat2) {
             *pCols = 0;
             *pRows = *pRows + 1;
         }
-        else {
-            *pCols = *pCols + 1;
-        }
-        
+
         u32 temp = *pCols;
 
         while (*pCols < totalCols) {
@@ -119,6 +116,8 @@ Matrix matMul(Matrix* mat1, Matrix* mat2) {
         *pRows = temp;
 
         finalMat.data[*pRows][*pCols] = innerProduct(&vecX, &vecY);
+
+        *pCols = *pCols + 1;
     }
 
     freeVector(&vecX);
@@ -127,17 +126,21 @@ Matrix matMul(Matrix* mat1, Matrix* mat2) {
     return finalMat;
 }
 
-void matSum(Matrix* mat1, Matrix* mat2, Matrix* target) {
+Matrix matSum(Matrix* mat1, Matrix* mat2) {
     u32 rows = mat1->shape.rows;
     u32 cols = mat1->shape.cols;
 
     assert(rows == mat2->shape.rows && cols == mat2->shape.cols);
 
+    double** matData = malloc(rows * cols * sizeof(**matData));
+
+    Matrix finalMat = createMatrix(rows, cols, matData);
+
     for (u32 i = 0; i < rows; i++) {
         for (u32 j = 0; j < cols; j++) {
-            target->data[i][j] = mat1->data[i][j] + mat2->data[i][j];
+            finalMat.data[i][j] = mat1->data[i][j] + mat2->data[i][j];
         }
     }
 
-    return;
+    return finalMat;
 }
