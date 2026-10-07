@@ -5,24 +5,30 @@
 
 #include "../include/matrix.h"
 
-Matrix initMatrix(u32 rows, u32 cols) {
+double getMatrixElem(Matrix* mat, u32 row, u32 col) {
+    return mat->data[row * mat->shape.cols + col];
+}
+
+u32 getMatrixPos(Matrix* mat, u32 row, u32 col) {
+    return row * mat->shape.cols + col;
+}
+
+Matrix createMatrix(u32 rows, u32 cols) {
+    double* matData = calloc(rows * cols, sizeof(*matData));
+
     Matrix mat;
     mat.shape.rows = rows;
     mat.shape.cols = cols;
+    mat.data = matData;
 
     return mat;
 }
 
-Matrix createMatrix(u32 rows, u32 cols, double** data) {
-    Matrix mat = initMatrix(rows, cols);
-
-    mat.data = malloc(rows * cols * sizeof(**data));
-
-    for (size_t i = 0;  i < rows; i++) {
-        for (u32 j = 0; j < cols; j++) {
-            mat.data[i][j] = data[i][j];
-        }
-    }
+Matrix createMatrixFromData(u32 rows, u32 cols, double* data) {
+    Matrix mat;
+    mat.shape.rows = rows;
+    mat.shape.cols = cols;
+    mat.data = data;
 
     return mat;
 }
@@ -48,12 +54,10 @@ Shape shape(Matrix* mat) {
 }
 
 void scalarMul(double scalar, Matrix* mat) {
-    double* pScalar = NULL;
-
     for (u32 i = 0; i < mat->shape.rows; i++) {
         for (u32 j = 0; j < mat->shape.cols; j++) {
-            pScalar = &mat->data[i][j]; 
-            *pScalar = scalar * *pScalar;
+            u32 idx = getMatrixPos(mat, i, j);
+            mat->data[idx] *= scalar;
         }
     }
 
@@ -61,67 +65,27 @@ void scalarMul(double scalar, Matrix* mat) {
 }
 
 void scalarSum(double scalar, Matrix* mat) {
-    double* pScalar = NULL;
-
     for (u32 i = 0; i < mat->shape.rows; i++) {
         for (u32 j = 0; j < mat->shape.cols; j++) {
-            pScalar = &mat->data[i][j]; 
-            *pScalar = scalar + *pScalar;
+            u32 idx = getMatrixPos(mat, i, j);
+            mat->data[idx] += scalar;
         }
     }
 
     return;
 }
 
-Matrix matMul(Matrix* mat1, Matrix* mat2) {
+//TODO: Find a way to do this using only for loops and indexes i, j and k
+Matrix matMul(Matrix* mat1, Matrix* mat2) { 
     assert(mat1->shape.cols == mat2->shape.rows);
 
     u32 totalRows = mat1->shape.rows;
     u32 totalCols = mat2->shape.cols;
 
-    double** dataMat = malloc(totalRows * totalCols * sizeof(**dataMat));
-    Matrix finalMat = createMatrix(totalRows, totalCols, dataMat);
+    Matrix finalMat = createMatrix(totalRows, totalCols);
 
-    double* dataVecX = malloc(totalRows * sizeof(*dataVecX));
-    double* dataVecY = malloc(totalCols * sizeof(*dataVecY));
-    Vector vecX = initVector(dataVecX, totalCols);
-    Vector vecY = initVector(dataVecY, totalRows); 
-
-    Shape coord;
-    coord.rows = 0;
-    coord.cols = 0;
-    
-    u32* pRows = &coord.rows;
-    u32* pCols = &coord.cols;
-
-    while (coord.rows < totalRows) {
-        if (*pCols > totalCols) {
-            *pCols = 0;
-            *pRows = *pRows + 1;
-        }
-
-        u32 temp = *pCols;
-
-        while (*pCols < totalCols) {
-            vecX.data[*pCols] = mat1->data[*pRows][*pCols];
-            *pCols = *pCols + 1;
-        }
-        *pCols = temp;
-        temp = *pRows;
-
-        while (*pRows < totalRows) {
-            vecY.data[*pRows] = mat2->data[*pRows][*pCols];
-            *pRows = *pRows + 1;
-        }
-        *pRows = temp;
-
-        finalMat.data[*pRows][*pCols] = innerProduct(&vecX, &vecY);
-
-        *pCols = *pCols + 1;
-    }
-
-    freeVector(&vecX);
-    freeVector(&vecY);
+    Vector vecX = createVector(totalRows);
+    Vector vecY = createVector(totalCols);
 
     return finalMat;
 }
@@ -134,11 +98,12 @@ Matrix matSum(Matrix* mat1, Matrix* mat2) {
 
     double** matData = malloc(rows * cols * sizeof(**matData));
 
-    Matrix finalMat = createMatrix(rows, cols, matData);
+    Matrix finalMat = createMatrix(rows, cols);
 
     for (u32 i = 0; i < rows; i++) {
         for (u32 j = 0; j < cols; j++) {
-            finalMat.data[i][j] = mat1->data[i][j] + mat2->data[i][j];
+            u32 idx = getMatrixPos(&finalMat, i, j);
+            finalMat.data[idx] = mat1->data[idx] + mat2->data[idx];
         }
     }
 

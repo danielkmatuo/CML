@@ -2,8 +2,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "headers/vector.h"
-#include "headers/matrix.h"
+#include "include/vector.h"
+#include "include/matrix.h"
 
 int main(void) {
     

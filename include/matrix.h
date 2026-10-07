@@ -18,12 +18,16 @@ typedef struct {
 
 typedef struct {
     Shape shape;
-    double** data;
+    double* data;
 } Matrix;
 
-Matrix initMatrix(u32 rows, u32 cols);
+double getMatrixElem(Matrix* mat, u32 row, u32 col);
 
-Matrix createMatrix(u32 rows, u32 cols, double** data);
+u32 getMatrixPos(Matrix* mat, u32 row, u32 col);
+
+Matrix createMatrix(u32 rows, u32 cols);
+
+Matrix createMatrixFromData(u32 rows, u32 cols, double* data);
 
 void freeMatrix(Matrix* mat);
 

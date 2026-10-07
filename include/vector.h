@@ -17,7 +17,7 @@ typedef struct {
 
 Vector createVector(u32 len);
 
-Vector initVector(double* data, u32 len);
+Vector createVectorFromData(u32 len, double* data);
 
 void freeVector(Vector* vec);
 

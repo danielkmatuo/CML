@@ -5,29 +5,26 @@
 #include "../include/vector.h"
 
 Vector createVector(u32 len) {
+    double* data = calloc(len, sizeof(*data));
+
     Vector vec;
     vec.len = len;
+    vec.data = data;
 
     return vec;
 }
 
-Vector initVector(double* data, u32 len) {
-    Vector vec = createVector(len); 
-    vec.data = malloc(len * sizeof(*data));
-    
-    size_t idx = vec.len;
-
-    while (idx > 0) {
-        vec.data[idx - 1] = data[idx - 1];
-        idx--;
-    }
+Vector createVectorFromData(u32 len, double* data) {
+    Vector vec;
+    vec.len = len;
+    vec.data = data;
 
     return vec;
 }
 
 void freeVector(Vector* vec) {
     if (vec == NULL) {
-        printf("Passed already NULL vector\n");
+        printf("Passed NULL vector\n");
         return;
     }
 
